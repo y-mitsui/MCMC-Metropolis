@@ -2,14 +2,6 @@
  * metropolis.c
  *
  *  Created on: 2017/06/03
- *      Author: yosuke
- */
-
-
-/*
- * { "n_iter":"1000", "parameters":[{"type":"simplex", "name": ""}]}
- *
- *
  */
 #include <stdio.h>
 #include "metropolis.h"
@@ -37,7 +29,7 @@ void metropolis(double (*logLikelihood)(void *, Parameter*), void* args, Paramet
                 for(k = 0; k < parameters[j].number; k++) {
                     double random_number;
                     randn(&random_number, 1);
-                    parameters[j]._parameters[k] = dmax(random_number + parameters[j]._adopt_parameters[k] * parameters[j].random_scale, 1e-5);
+                    parameters[j]._parameters[k] = dmax(parameters[j]._adopt_parameters[k] + random_number * parameters[j].random_scale, 1e-5);
                     parameter_sum += parameters[j]._parameters[k];
                 }
 

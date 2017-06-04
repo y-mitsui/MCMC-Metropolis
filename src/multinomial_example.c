@@ -4,9 +4,11 @@
  *  Created on: 2017/06/04
  */
 #include "metropolis.h"
-#define N_SAMPLES 200
-#define N_DIMENTIONS 3
-#define N_ITER 1000
+#include <math.h>
+#include <string.h>
+#define N_SAMPLES 1000000
+#define N_DIMENTIONS 5
+#define N_ITER 500000
 
 typedef struct {
     unsigned int *sample;
@@ -18,23 +20,36 @@ double multinomialLogLikelihood(MultinomialArgs *multinomial_args, Parameter *pa
     int i;
     double r = 0.;
 
-    for(i=0; i < multinomial_args->n_sample; i++) {
-        r += multinomialLogPmf(&multinomial_args->sample[i * multinomial_args->n_dimentions], parameters[0].normalized_parameters, multinomial_args->n_dimentions);
+    for(i=0; i < multinomial_args->n_dimentions; i++) {
+        r += multinomial_args->sample[i] * log(parameters[0].normalized_parameters[i]);
     }
     return r;
 }
 
 int main(void) {
     int i, j;
-    double true_prob[N_DIMENTIONS] = {0.1, 0.5, 0.4};
+    double true_prob[N_DIMENTIONS];
+    double dirichlet_alpha[N_DIMENTIONS];
     unsigned int multi_variate[N_DIMENTIONS];
     gsl_rng *rng = gsl_rng_alloc (gsl_rng_default);
-    unsigned int *sample = dMalloc(sizeof(unsigned int) * N_SAMPLES * N_DIMENTIONS);
+    unsigned int *sample = dMalloc(sizeof(unsigned int) * N_DIMENTIONS);
+    memset(sample, 0, sizeof(unsigned int) * N_DIMENTIONS);
+
+    for(j=0; j < N_DIMENTIONS; j++) {
+        dirichlet_alpha[j] = 1.0;
+    }
+    gsl_ran_dirichlet(rng, N_DIMENTIONS, dirichlet_alpha, true_prob);
+    printf("true prob [");
+    for(j=0; j < N_DIMENTIONS; j++) {
+        printf("%f, ", true_prob[j]);
+    }
+    printf("]\n");
 
     for(i=0; i < N_SAMPLES; i++) {
         gsl_ran_multinomial(rng, 3, 1, true_prob, multi_variate);
         for(j=0; j < N_DIMENTIONS; j++) {
-            sample[i * N_DIMENTIONS + j] = multi_variate[j];
+            if(multi_variate[j] == 1)
+                sample[j]++;
         }
     }
     MultinomialArgs multinomial_args;
@@ -46,13 +61,13 @@ int main(void) {
     Parameter normal_parameters[1];
     normal_parameters[0].type = SIMPLEX;
     normal_parameters[0].number = N_DIMENTIONS;
-    normal_parameters[0].random_scale = 1e-6;
+    normal_parameters[0].random_scale = 5e-3;
     normal_parameters[0].lower = 0.0;
     normal_parameters[0]._parameters = dMalloc(sizeof(double) * normal_parameters[0].number);
     normal_parameters[0].normalized_parameters = normal_parameters[0]._parameters;
 
 
-    metropolis((double (*)(void *, Parameter *))multinomialLogLikelihood, &multinomial_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), 100000, 1000);
+    metropolis((double (*)(void *, Parameter *))multinomialLogLikelihood, &multinomial_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), N_ITER, 100000);
     for(int i=0; i < N_DIMENTIONS; i++) {
         printf("%f ", normal_parameters[0].normalized_parameters[i]);
     }

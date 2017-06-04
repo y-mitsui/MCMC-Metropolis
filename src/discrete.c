@@ -14,4 +14,3 @@ double multinomialLogPmf(unsigned int *sample_x, double *alpha, int n_dimentions
     }
     return r;
 }
-
