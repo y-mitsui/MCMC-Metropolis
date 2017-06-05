@@ -61,15 +61,15 @@ int main(void) {
     Parameter normal_parameters[1];
     normal_parameters[0].type = SIMPLEX;
     normal_parameters[0].number = N_DIMENTIONS;
-    normal_parameters[0].random_scale = 5e-3;
+    normal_parameters[0].random_scale = 1e-2;
     normal_parameters[0].lower = 0.0;
     normal_parameters[0]._parameters = dMalloc(sizeof(double) * normal_parameters[0].number);
     normal_parameters[0].normalized_parameters = normal_parameters[0]._parameters;
 
 
-    metropolis((double (*)(void *, Parameter *))multinomialLogLikelihood, &multinomial_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), N_ITER, 100000);
+    metropolis((double (*)(void *, Parameter *))multinomialLogLikelihood, &multinomial_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), 1000000, 500000, 10000);
     for(int i=0; i < N_DIMENTIONS; i++) {
-        printf("%f ", normal_parameters[0].normalized_parameters[i]);
+        printf("%f ", normal_parameters[0].mean_parameters[i]);
     }
     puts("");
     return 0;

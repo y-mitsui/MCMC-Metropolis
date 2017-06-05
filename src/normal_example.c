@@ -53,7 +53,7 @@ int main(void) {
     normal_parameters[1]._parameters = dMalloc(sizeof(double) * normal_parameters[1].number);
     normal_parameters[1].normalized_parameters = normal_parameters[1]._parameters;
 
-    metropolis((double (*)(void *, Parameter *))normalLogLikelihood, &normal_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), 50000, 1000);
+    metropolis((double (*)(void *, Parameter *))normalLogLikelihood, &normal_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), 50000, 25000, 1000);
     printf("%f %f\n", normal_parameters[0].normalized_parameters[0], normal_parameters[1].normalized_parameters[0]);
 
 }
