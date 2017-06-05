@@ -4,7 +4,7 @@
  *  Created on: 2017/06/04
  */
 #include "metropolis.h"
-#define N_SAMPLES 200
+#define N_SAMPLES 500
 #define N_DIMENTIONS 3
 #define N_ITER 1000
 
@@ -46,15 +46,15 @@ int main(void) {
     Parameter normal_parameters[1];
     normal_parameters[0].type = SIMPLEX;
     normal_parameters[0].number = N_DIMENTIONS;
-    normal_parameters[0].random_scale = 1e-6;
+    normal_parameters[0].random_scale = 1e-2;
     normal_parameters[0].lower = 0.0;
     normal_parameters[0]._parameters = dMalloc(sizeof(double) * normal_parameters[0].number);
     normal_parameters[0].normalized_parameters = normal_parameters[0]._parameters;
 
 
-    metropolis((double (*)(void *, Parameter *))multinomialLogLikelihood, &multinomial_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), 100000, 1000);
+    metropolis((double (*)(void *, Parameter *))multinomialLogLikelihood, &multinomial_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), 1000000, 500000, 10000);
     for(int i=0; i < N_DIMENTIONS; i++) {
-        printf("%f ", normal_parameters[0].normalized_parameters[i]);
+        printf("%f ", normal_parameters[0].mean_parameters[i]);
     }
     puts("");
     return 0;

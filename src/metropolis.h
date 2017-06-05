@@ -24,9 +24,11 @@ typedef struct {
     int number;
     double random_scale;
     double lower;
+    double upper;
     double *_parameters;
     double *_adopt_parameters;
     double *normalized_parameters;
+    double *mean_parameters;
 }Parameter;
 
 void randn(double *result, int n);
@@ -35,7 +37,7 @@ void *dMalloc(int size);
 double logNormalPdf(gsl_vector *sample_x, double *means, double *covars, int n_dimentions);
 double normal1DLogPdf(double sample_x, double mean, double std);
 double multinomialLogPmf(unsigned int *sample_x, double *alpha, int n_dimentions);
-void metropolis(double (*logLikelihood)(void *, Parameter*), void* args, Parameter* parameters, int n_parameters, int n_iter, int print_log_freq);
+void metropolis(double (*logLikelihood)(void *, Parameter*), void* args, Parameter* parameters, int n_parameters, int n_iter, int warmup, int print_log_freq);
 gsl_matrix *gsl_matrix_clone(const gsl_matrix *src);
 gsl_vector *gsl_vector_clone(const gsl_vector *src);
 double gsl_det(gsl_matrix *m);
