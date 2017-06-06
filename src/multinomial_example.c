@@ -6,8 +6,8 @@
 #include "metropolis.h"
 #include <math.h>
 #include <string.h>
-#define N_SAMPLES 1000000
-#define N_DIMENTIONS 5
+#define N_SAMPLES 10000
+#define N_DIMENTIONS 100
 #define N_ITER 500000
 
 typedef struct {
@@ -39,19 +39,21 @@ int main(void) {
         dirichlet_alpha[j] = 1.0;
     }
     gsl_ran_dirichlet(rng, N_DIMENTIONS, dirichlet_alpha, true_prob);
-    printf("true prob [");
-    for(j=0; j < N_DIMENTIONS; j++) {
-        printf("%f, ", true_prob[j]);
-    }
-    printf("]\n");
 
     for(i=0; i < N_SAMPLES; i++) {
-        gsl_ran_multinomial(rng, 3, 1, true_prob, multi_variate);
+        gsl_ran_multinomial(rng, N_DIMENTIONS, 1, true_prob, multi_variate);
         for(j=0; j < N_DIMENTIONS; j++) {
             if(multi_variate[j] == 1)
                 sample[j]++;
         }
     }
+
+    printf("true prob [");
+	for(j=0; j < N_DIMENTIONS; j++) {
+		printf("%f, ", (double)sample[j] / N_SAMPLES);
+	}
+	printf("]\n");
+
     MultinomialArgs multinomial_args;
 
     multinomial_args.sample = sample;
@@ -61,13 +63,12 @@ int main(void) {
     Parameter normal_parameters[1];
     normal_parameters[0].type = SIMPLEX;
     normal_parameters[0].number = N_DIMENTIONS;
-    normal_parameters[0].random_scale = 1e-2;
+    normal_parameters[0].random_scale = 5e-4;
     normal_parameters[0].lower = 0.0;
     normal_parameters[0]._parameters = dMalloc(sizeof(double) * normal_parameters[0].number);
     normal_parameters[0].normalized_parameters = normal_parameters[0]._parameters;
 
-
-    metropolis((double (*)(void *, Parameter *))multinomialLogLikelihood, &multinomial_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), 1000000, 500000, 10000);
+    metropolis((double (*)(void *, Parameter *))multinomialLogLikelihood, &multinomial_args, normal_parameters, sizeof(normal_parameters) / sizeof(normal_parameters[0]), N_ITER, N_ITER / 2, 10000);
     for(int i=0; i < N_DIMENTIONS; i++) {
         printf("%f ", normal_parameters[0].mean_parameters[i]);
     }

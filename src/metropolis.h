@@ -16,7 +16,8 @@
 
 enum PARAMETER_TYPE {
     SIMPLEX,
-    REAL
+    REAL,
+	ONE_HOT
 };
 
 typedef struct {
@@ -34,13 +35,17 @@ typedef struct {
 void randn(double *result, int n);
 double xor128();
 void *dMalloc(int size);
+/*
 double logNormalPdf(gsl_vector *sample_x, double *means, double *covars, int n_dimentions);
 double normal1DLogPdf(double sample_x, double mean, double std);
 double multinomialLogPmf(unsigned int *sample_x, double *alpha, int n_dimentions);
+*/
 void metropolis(double (*logLikelihood)(void *, Parameter*), void* args, Parameter* parameters, int n_parameters, int n_iter, int warmup, int print_log_freq);
+/*
 gsl_matrix *gsl_matrix_clone(const gsl_matrix *src);
 gsl_vector *gsl_vector_clone(const gsl_vector *src);
 double gsl_det(gsl_matrix *m);
+*/
 
 
 #endif /* SRC_METROPOLIS_H_ */
